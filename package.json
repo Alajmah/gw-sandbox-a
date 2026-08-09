@@ -1,0 +1,6 @@
+{
+  "name": "gw-sandbox-a",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "src/index.js"
+}

@@ -1,0 +1,15 @@
+version: 1
+pillars:
+  triage:
+    enabled: true
+    auto_label: true
+    auto_comment: true
+    duplicate_detection: true
+  issue_fix:
+    enabled: true
+    max_file_changes: 3
+    min_confidence_to_submit: medium
+    allowed_labels:
+      - bug
+      - good first issue
+      - help wanted
