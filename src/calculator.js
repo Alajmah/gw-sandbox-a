@@ -5,7 +5,7 @@ export function add(a, b) {
 }
 
 export function subtract(a, b) {
-  return a + b; // BUG: should be a - b
+  return a - b; // BUG: should be a - b
 }
 
 export function multiply(a, b) {
