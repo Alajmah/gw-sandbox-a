@@ -1,0 +1,62 @@
+name: Reasoning Benchmark Pilot
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_model:
+        description: Target model ID
+        required: true
+        default: gpt-5.6-sol
+      judge_model:
+        description: Evaluator model ID
+        required: true
+        default: gpt-5.6-sol
+
+permissions:
+  contents: read
+
+jobs:
+  pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    defaults:
+      run:
+        working-directory: reasoning-framework-benchmark
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      OPENAI_TARGET_MODEL: ${{ inputs.target_model }}
+      OPENAI_JUDGE_MODEL: ${{ inputs.judge_model }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: reasoning-framework-benchmark/requirements.txt
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Verify secret
+        shell: bash
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "OPENAI_API_KEY repository secret is required." >&2
+            exit 1
+          fi
+
+      - name: Run blinded pilot
+        run: python pilot.py
+
+      - name: Upload benchmark results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reasoning-benchmark-pilot-${{ github.run_id }}
+          path: reasoning-framework-benchmark/results/
+          if-no-files-found: warn
+          retention-days: 30
