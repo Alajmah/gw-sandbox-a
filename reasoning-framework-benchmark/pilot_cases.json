@@ -1,0 +1,199 @@
+[
+  {
+    "case_id": "RF-A02",
+    "family": "A",
+    "title": "Employee Training",
+    "difficulty": 4,
+    "expected_mode": "FULL",
+    "tags": ["correlation", "selection"],
+    "turns": [{
+      "turn": 1,
+      "agent_input": "Employees who attend at least six optional training sessions per year receive performance ratings 14% higher than employees who attend fewer than two. Management proposes requiring everyone to attend at least six sessions. Evaluate the proposal.",
+      "judge_reference": {
+        "protocol": ["Distinguish association from causation.", "Identify selection and confounding mechanisms.", "Recommend a causal test before mandate if practical."],
+        "outcome": ["Known observations: Higher training attendance is associated with higher performance ratings.", "Not established: Training causes higher performance.", "Plausible explanations: Training improves performance.; High performers self-select into training.; Managers nominate stronger employees.; Job role predicts both attendance and ratings.; Conscientiousness causes both.", "Decision-relevant evidence: Randomized assignment.; Pre-training performance.; Within-employee changes.; Matched cohorts.; Eligibility rules."]
+      }
+    }],
+    "evaluator_key": {
+      "observations": ["Higher training attendance is associated with higher performance ratings."],
+      "not_observed": ["Training causes higher performance."],
+      "plausible_hypotheses": ["Training improves performance.", "High performers self-select into training.", "Managers nominate stronger employees.", "Job role predicts both attendance and ratings.", "Conscientiousness causes both."],
+      "critical_first_principles": [],
+      "discriminating_evidence": ["Randomized assignment.", "Pre-training performance.", "Within-employee changes.", "Matched cohorts.", "Eligibility rules."],
+      "decision_critical_uncertainties": [], "irrelevant_uncertainties": [], "constraints": [],
+      "strong_behavior": ["Distinguish association from causation.", "Identify selection and confounding mechanisms.", "Recommend a causal test before mandate if practical."],
+      "acceptable_interventions": [], "critical_violations": ["P05", "P08"], "scoring_notes": ""
+    },
+    "evaluation_profile": {
+      "protocol_dimensions": ["problem_formulation", "observation_inference", "diagnostic_breadth", "mechanism", "falsifiability", "prediction", "testing", "evidence", "uncertainty", "assumptions", "stopping", "efficiency"],
+      "outcome_dimensions": ["correctness", "decision_quality", "mechanism", "evidence", "uncertainty", "efficiency", "mode_fit"]
+    }
+  },
+  {
+    "case_id": "RF-B01",
+    "family": "B",
+    "title": "Mobile Battery Drain",
+    "difficulty": 4,
+    "expected_mode": "FULL",
+    "tags": ["hypothesis-competition", "mobile"],
+    "turns": [{
+      "turn": 1,
+      "agent_input": "After a mobile-app update, users report that battery life is roughly 30% worse. Three engineering teams propose explanations: H1 a background synchronization loop; H2 increased GPS use; H3 more frequent cellular-radio wakeups. What should the investigation do next?",
+      "judge_reference": {
+        "protocol": ["Derive distinct predictions for each mechanism before broad data collection.", "Choose measurements with high discrimination."],
+        "outcome": ["Known observations: Battery life worsened after an app update.", "Plausible explanations: Background synchronization loop.; Increased GPS use.; More frequent cellular-radio wakeups.", "Decision-relevant evidence: Background CPU/network activity independent of movement.; Location-service activity and permission/use correlation.; Radio wakeups and cellular-vs-Wi-Fi differential."]
+      }
+    }],
+    "evaluator_key": {
+      "observations": ["Battery life worsened after an app update."], "not_observed": [],
+      "plausible_hypotheses": ["Background synchronization loop.", "Increased GPS use.", "More frequent cellular-radio wakeups."],
+      "critical_first_principles": [],
+      "discriminating_evidence": ["Background CPU/network activity independent of movement.", "Location-service activity and permission/use correlation.", "Radio wakeups and cellular-vs-Wi-Fi differential."],
+      "decision_critical_uncertainties": [], "irrelevant_uncertainties": [], "constraints": [],
+      "strong_behavior": ["Derive distinct predictions for each mechanism before broad data collection.", "Choose measurements with high discrimination."],
+      "acceptable_interventions": [], "critical_violations": ["P03", "P08"], "scoring_notes": ""
+    },
+    "evaluation_profile": {
+      "protocol_dimensions": ["problem_formulation", "observation_inference", "diagnostic_breadth", "mechanism", "falsifiability", "prediction", "testing", "evidence", "uncertainty", "assumptions", "stopping", "efficiency"],
+      "outcome_dimensions": ["correctness", "decision_quality", "mechanism", "evidence", "uncertainty", "efficiency", "mode_fit"]
+    }
+  },
+  {
+    "case_id": "RF-C01",
+    "family": "C",
+    "title": "Memory Leak Diagnosis",
+    "difficulty": 5,
+    "expected_mode": "FULL",
+    "tags": ["sequential", "revision", "systems"],
+    "turns": [
+      {
+        "turn": 1,
+        "agent_input": "A server crashes every few hours. Engineers suspect a memory leak because the failure resembles previous out-of-memory incidents. What is your working diagnosis and next test?",
+        "expected_transition": "HYPOTHESIZE→PREDICT/TEST",
+        "judge_reference": {
+          "protocol": ["Keep memory leak as a working hypothesis rather than a conclusion.", "The next test should inspect memory behavior near failure; alternatives need not yet be named exhaustively."],
+          "outcome": ["A memory leak is plausible from resemblance to prior incidents but not established.", "A high-value next test is memory telemetry around crashes."]
+        }
+      },
+      {
+        "turn": 2,
+        "agent_input": "Detailed telemetry shows memory utilization remains between 52% and 57% before every crash.",
+        "expected_revision": "Strongly weaken memory-exhaustion hypothesis.",
+        "judge_reference": {
+          "protocol": ["Stable memory at 52–57% should strongly weaken a memory-exhaustion explanation.", "The agent should redirect attention to other resource/dependency failure mechanisms rather than rationalizing the original view."],
+          "outcome": ["Memory exhaustion is now poorly supported; investigate other resource or dependency states correlated with crashes."]
+        }
+      },
+      {
+        "turn": 3,
+        "agent_input": "Every crash occurs when the database connection pool reaches its maximum size.",
+        "expected_revision": "Connection-pool exhaustion becomes leading proximate mechanism.",
+        "judge_reference": {
+          "protocol": ["Connection-pool saturation should become the leading proximate mechanism.", "The agent should still ask why the pool saturates rather than treating correlation as the initiating root cause."],
+          "outcome": ["Pool saturation is strongly associated with every crash and is the leading proximate mechanism; investigate what blocks connection release/return."]
+        }
+      },
+      {
+        "turn": 4,
+        "agent_input": "The pool reaches its maximum because downstream queries stop returning during a network partition.",
+        "expected_revision": "Model network partition → stalled queries → pool saturation → request failure.",
+        "judge_reference": {
+          "protocol": ["Revise to the causal chain network partition → stalled downstream queries → pool saturation → request failure/crash.", "Distinguish initiating cause from proximate mechanism."],
+          "outcome": ["The network partition is the initiating cause in the supplied chain; pool saturation is downstream/proximate."]
+        }
+      }
+    ],
+    "evaluator_key": {
+      "observations": ["Server crashes every few hours; initial appearance resembles prior OOM incidents."],
+      "not_observed": ["Memory exhaustion is established."],
+      "plausible_hypotheses": ["Memory leak.", "Connection/resource exhaustion.", "Dependency failure."],
+      "critical_first_principles": [],
+      "discriminating_evidence": ["Memory trajectory.", "Connection-pool state.", "Downstream network/query behavior."],
+      "decision_critical_uncertainties": [], "irrelevant_uncertainties": [], "constraints": [],
+      "strong_behavior": ["Keep memory leak as hypothesis at t1.", "Weaken it after stable memory evidence.", "Promote pool saturation after correlation.", "Distinguish network partition as initiating cause from pool saturation as proximate mechanism."],
+      "acceptable_interventions": [], "critical_violations": ["P10"], "scoring_notes": ""
+    },
+    "evaluation_profile": {
+      "protocol_dimensions": ["problem_formulation", "observation_inference", "diagnostic_breadth", "mechanism", "falsifiability", "prediction", "testing", "evidence", "revision", "uncertainty", "assumptions", "stopping", "efficiency"],
+      "outcome_dimensions": ["correctness", "decision_quality", "mechanism", "evidence", "revision", "uncertainty", "efficiency", "mode_fit"]
+    }
+  },
+  {
+    "case_id": "RF-D01",
+    "family": "D",
+    "title": "Kafka Requirement",
+    "difficulty": 3,
+    "expected_mode": ["COMPACT", "FULL"],
+    "tags": ["first-principles", "architecture"],
+    "turns": [{
+      "turn": 1,
+      "agent_input": "A startup says its new event-driven platform must use Kafka because scalable event systems require Kafka. Design the architecture.",
+      "judge_reference": {
+        "protocol": ["Treat Kafka as candidate implementation, not first principle.", "Derive requirements before selecting technology."],
+        "outcome": ["Known observations: Startup asserts Kafka is required.", "Not established: Kafka is logically necessary.", "Plausible explanations: Kafka may fit requirements.; Other messaging/event technologies may fit better.", "Relevant fundamentals: Architecture should be derived from throughput, durability, ordering, replay, delivery semantics, latency, fan-out, retention, and operational constraints."]
+      }
+    }],
+    "evaluator_key": {
+      "observations": ["Startup asserts Kafka is required."], "not_observed": ["Kafka is logically necessary."],
+      "plausible_hypotheses": ["Kafka may fit requirements.", "Other messaging/event technologies may fit better."],
+      "critical_first_principles": ["Architecture should be derived from throughput, durability, ordering, replay, delivery semantics, latency, fan-out, retention, and operational constraints."],
+      "discriminating_evidence": [], "decision_critical_uncertainties": [], "irrelevant_uncertainties": [], "constraints": [],
+      "strong_behavior": ["Treat Kafka as candidate implementation, not first principle.", "Derive requirements before selecting technology."],
+      "acceptable_interventions": [], "critical_violations": ["P04"], "scoring_notes": ""
+    },
+    "evaluation_profile": {
+      "protocol_dimensions": ["problem_formulation", "first_principles", "mechanism", "assumptions", "constraints", "candidate_interventions", "engineering", "robustness", "stopping", "efficiency"],
+      "outcome_dimensions": ["correctness", "decision_quality", "mechanism", "engineering", "robustness", "efficiency", "mode_fit"]
+    }
+  },
+  {
+    "case_id": "RF-E04",
+    "family": "E",
+    "title": "Fraud Detection Threshold",
+    "difficulty": 5,
+    "expected_mode": "FULL",
+    "tags": ["risk", "reversibility", "adaptive-system"],
+    "turns": [{
+      "turn": 1,
+      "agent_input": "A payment company can cut fraud losses by rejecting every transaction with a fraud score above a lower threshold. Initial simulations suggest fraud losses would fall 40%. Should it deploy the lower threshold globally?",
+      "judge_reference": {
+        "protocol": ["Evaluate total-loss objective.", "Prefer controlled/reversible rollout under uncertainty.", "Account for adaptive adversaries."],
+        "outcome": ["Known observations: Simulation predicts 40% lower fraud losses under a lower threshold.", "Not established: Total business loss will improve 40%.", "Plausible explanations: Lower threshold reduces net loss.; False positives/customer abandonment/merchant loss outweigh fraud savings.; Attackers adapt.", "Relevant fundamentals: Decision objective is total expected loss/value, not fraud loss alone.", "Decision-relevant evidence: False-positive rate and customer value.; Merchant impact.; Regional/segment heterogeneity.; Controlled rollout outcomes.; Adversarial adaptation."]
+      }
+    }],
+    "evaluator_key": {
+      "observations": ["Simulation predicts 40% lower fraud losses under a lower threshold."], "not_observed": ["Total business loss will improve 40%."],
+      "plausible_hypotheses": ["Lower threshold reduces net loss.", "False positives/customer abandonment/merchant loss outweigh fraud savings.", "Attackers adapt."],
+      "critical_first_principles": ["Decision objective is total expected loss/value, not fraud loss alone."],
+      "discriminating_evidence": ["False-positive rate and customer value.", "Merchant impact.", "Regional/segment heterogeneity.", "Controlled rollout outcomes.", "Adversarial adaptation."],
+      "decision_critical_uncertainties": [], "irrelevant_uncertainties": [], "constraints": [],
+      "strong_behavior": ["Evaluate total-loss objective.", "Prefer controlled/reversible rollout under uncertainty.", "Account for adaptive adversaries."],
+      "acceptable_interventions": [], "critical_violations": ["P16", "P17", "P18"], "scoring_notes": ""
+    },
+    "evaluation_profile": {
+      "protocol_dimensions": ["problem_formulation", "observation_inference", "first_principles", "mechanism", "evidence", "uncertainty", "assumptions", "constraints", "candidate_interventions", "engineering", "second_order", "robustness", "reversibility", "stopping", "efficiency", "diagnostic_breadth", "testing"],
+      "outcome_dimensions": ["correctness", "decision_quality", "mechanism", "evidence", "uncertainty", "engineering", "robustness", "efficiency", "mode_fit"]
+    }
+  },
+  {
+    "case_id": "RF-F01",
+    "family": "F",
+    "title": "Arithmetic",
+    "difficulty": 1,
+    "expected_mode": "DIRECT",
+    "tags": ["mode-selection", "trivial"],
+    "turns": [{
+      "turn": 1,
+      "agent_input": "What is 37 × 24?",
+      "judge_reference": {"protocol": ["Answer 888 directly."], "outcome": ["Known observations: Arithmetic task.", "Any elaborate diagnostic protocol is over-reasoning."]}
+    }],
+    "evaluator_key": {
+      "observations": ["Arithmetic task."], "not_observed": [], "plausible_hypotheses": [], "critical_first_principles": [], "discriminating_evidence": [], "decision_critical_uncertainties": [], "irrelevant_uncertainties": [], "constraints": [],
+      "strong_behavior": ["Answer 888 directly."], "acceptable_interventions": [], "critical_violations": ["P20"], "scoring_notes": "Any elaborate diagnostic protocol is over-reasoning."
+    },
+    "evaluation_profile": {
+      "protocol_dimensions": ["problem_formulation", "stopping", "efficiency"],
+      "outcome_dimensions": ["correctness", "decision_quality", "efficiency", "mode_fit"]
+    }
+  }
+]
